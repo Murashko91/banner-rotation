@@ -3,7 +3,9 @@ package storage
 import "context"
 
 type Storage interface {
-	GetBannersBySlot(ctx context.Context, slotID int) ([]Banner, error)
+	Connect() error
+	Close() error
+	GetBannersBySlot(ctx context.Context, slotID int) ([]int, error)
 	GetBannersStat(ctx context.Context, slotID int, groupID int, bannerIDs []int) ([]Statistic, error)
 	AddBannerToSlot(ctx context.Context, bannerID int, slotID int) error
 	DeleteBannerFromSlot(ctx context.Context, bannerID int, slotID int) error

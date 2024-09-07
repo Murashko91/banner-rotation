@@ -21,7 +21,7 @@ func getBannerRotation(w http.ResponseWriter, r *http.Request, a app.Application
 		return
 	}
 
-	groupID, err := strconv.Atoi(r.URL.Query().Get("slot_id"))
+	groupID, err := strconv.Atoi(r.URL.Query().Get("group_id"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))

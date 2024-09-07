@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"strings"
 
+	_ "github.com/jackc/pgx/stdlib"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 	"github.com/otus-murashko/banners-rotation/internal/storage"
 )
 
@@ -40,30 +42,30 @@ func (s *Storage) Close() error {
 	return nil
 }
 
-func (s *Storage) GetBannersBySlot(ctx context.Context, slotID int) ([]storage.Banner, error) {
+func (s *Storage) GetBannersBySlot(ctx context.Context, slotID int) ([]int, error) {
 
-	sql := `SELECT banner, desc
+	sql := `SELECT banner
 	FROM rotation 
 	WHERE slot = $1`
 
 	rows, err := s.db.QueryxContext(ctx, sql, slotID)
 	if err != nil {
-		return []storage.Banner{}, err
+		return nil, err
 	}
 	defer rows.Close()
 
-	banners := make([]storage.Banner, 0)
+	banners := make([]int, 0)
 	errorsStr := make([]string, 0)
 	for rows.Next() {
-		var qBanner storage.Banner
+		var qBannerID int
 
-		err := rows.StructScan(&qBanner)
+		err := rows.Scan(&qBannerID)
 		if err != nil {
 			errorsStr = append(errorsStr, err.Error())
 			continue
 		}
 
-		banners = append(banners, qBanner)
+		banners = append(banners, qBannerID)
 	}
 	return banners, getQueryError(errorsStr)
 }
@@ -72,10 +74,12 @@ func (s *Storage) GetBannersStat(ctx context.Context, slotID int, groupID int, b
 
 	sql := `SELECT banner, slot, clicks, shows, s_group
 	FROM statistic 
-	WHERE slot = $1 AND s_group = $2 AND banner IN ($3)`
+	WHERE slot = $1 AND s_group = $2 AND banner = any($3)`
 
-	rows, err := s.db.QueryxContext(ctx, sql, slotID, groupID, bannerIDs)
+	rows, err := s.db.QueryxContext(ctx, sql, slotID, groupID, pq.Array(bannerIDs))
 	if err != nil {
+
+		fmt.Println("EEEEE", err)
 		return []storage.Statistic{}, err
 	}
 	defer rows.Close()
@@ -127,7 +131,7 @@ func (s *Storage) AddBannerToSlot(ctx context.Context, bannerID int, slotID int)
 	}
 
 	sql := `INSERT INTO rotation(banner, slot)
-		 	VALUES($1, $2)`
+		 	VALUES($1, $2) ON CONFLICT (banner, slot) DO NOTHING `
 
 	// Insert to Slot
 	_, err = s.db.ExecContext(ctx, sql, bannerID, slotID)
@@ -151,7 +155,7 @@ func (s *Storage) AddBannerToSlot(ctx context.Context, bannerID int, slotID int)
 	for rows.Next() {
 		var groupID int
 
-		err := rows.StructScan(&groupID)
+		err := rows.Scan(&groupID)
 		if err != nil {
 			errorsStr = append(errorsStr, err.Error())
 			continue
@@ -168,10 +172,11 @@ func (s *Storage) AddBannerToSlot(ctx context.Context, bannerID int, slotID int)
 		return fmt.Errorf("no groups created in DB")
 	}
 
-	sql = `INSERT INTO statistic(banner, slot, s_group)
-		 	VALUES ` + createInsertStatValues(groupIDs) +
-		"ON CONFLICT (anner, slot, s_group) DO UPDATE "
+	sql = "INSERT INTO statistic(banner, slot, s_group) VALUES " +
+		createInsertStatValues(groupIDs) +
+		"ON CONFLICT (banner, slot, s_group) DO NOTHING "
 
+	fmt.Println(sql)
 	// Create empty statistic for all sosial groups
 
 	_, err = s.db.ExecContext(ctx, sql, bannerID, slotID)
@@ -227,7 +232,7 @@ func (s *Storage) CreateGroup(ctx context.Context, desc string) (int, error) {
 
 func createInstance(ctx context.Context, db *sqlx.DB, tNmae, desc string) (int, error) {
 
-	sql := fmt.Sprintf("INSERT INTO %s(desc) VALUES($1) RETURNING id", tNmae)
+	sql := fmt.Sprintf("INSERT INTO %s(descr) VALUES($1) RETURNING id", tNmae)
 
 	lastInsertID := 0
 

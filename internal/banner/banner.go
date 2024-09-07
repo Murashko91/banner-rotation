@@ -23,18 +23,10 @@ func (bs BannerBanditSelector) GetBanner(ctx context.Context, slotID, sGroupID i
 
 	// get all statistic for the banners and social group
 
-	banners, err := bs.db.GetBannersBySlot(ctx, slotID)
+	bannerIDs, err := bs.db.GetBannersBySlot(ctx, slotID)
 
 	if err != nil {
 		return storage.Banner{}, err
-	}
-
-	bannerIDs := make([]int, 0, len(banners))
-	bannersMap := make(map[int]storage.Banner)
-
-	for _, banner := range banners {
-		bannerIDs = append(bannerIDs, banner.ID)
-		bannersMap[banner.ID] = banner
 	}
 
 	stats, err := bs.db.GetBannersStat(ctx, slotID, sGroupID, bannerIDs)
@@ -73,6 +65,6 @@ func (bs BannerBanditSelector) GetBanner(ctx context.Context, slotID, sGroupID i
 
 	bs.db.UpdateShowStat(ctx, bestStat)
 
-	return bannersMap[bestStat.BannerID], nil
+	return storage.Banner{ID: bestStat.BannerID}, nil
 
 }

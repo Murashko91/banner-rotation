@@ -1,20 +1,11 @@
 
-mb:
-  rmq:
-    host: "rabbitmq"
-    port: 5672
-    user: "sergey"
-    password: "murashko"
-    exchange: "calendar"
-    exchangeType: "direct"
-    routingKey: "calendar_routing_key"
-  intervalCheck: 5
-logger:
-  level: "info"
 db:
-  host: "postgresql"
+  host: "localhost"
   port: 5432
-  user: "otus"
-  password: "otus"
-  dbName: "calendar"
+  user: "postgres"
+  password: "postgres"
+  dbName: "banners_rotation"
   inMemory: false
+server:
+  host: "localhost"
+  port: 8888
