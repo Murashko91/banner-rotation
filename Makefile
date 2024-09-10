@@ -1,4 +1,6 @@
 BIN := "./bin/banners_rotation"
+DB_NAME := "banners_rotation"
+DB_CONTAINER_NAME := "banners_rotation_psql"
 
 DOCKER_IMG="banners_rotation:develop"
 
@@ -11,6 +13,11 @@ build:
 run: build
 	$(BIN) -conf ./configs/config.yaml
 
+db-up:
+	docker run --name $(DB_CONTAINER_NAME) -p 5454:5432 -e POSTGRES_USER=otus -e POSTGRES_PASSWORD=otus -e POSTGRES_DB=$(DB_NAME) -d -v "./migrations":/docker-entrypoint-initdb.d postgres:13.3
+db-down:
+	docker stop $(DB_CONTAINER_NAME)
+	docker remove $(DB_CONTAINER_NAME)
 build-img:
 	docker build \
 		--build-arg=LDFLAGS="$(LDFLAGS)" \
