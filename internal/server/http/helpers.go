@@ -12,9 +12,7 @@ import (
 )
 
 func getBannerRotation(w http.ResponseWriter, r *http.Request, a app.Application) {
-
 	slotID, err := strconv.Atoi(r.URL.Query().Get("slot_id"))
-
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))
@@ -29,7 +27,6 @@ func getBannerRotation(w http.ResponseWriter, r *http.Request, a app.Application
 	}
 
 	banner, err := a.GetBannerRotation(context.Background(), slotID, groupID)
-
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
@@ -37,7 +34,6 @@ func getBannerRotation(w http.ResponseWriter, r *http.Request, a app.Application
 	}
 
 	data, err := json.Marshal(banner)
-
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
@@ -46,11 +42,9 @@ func getBannerRotation(w http.ResponseWriter, r *http.Request, a app.Application
 
 	w.WriteHeader(http.StatusOK)
 	w.Write(data)
-
 }
 
 func addBannerRotation(w http.ResponseWriter, r *http.Request, a app.Application) {
-
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -67,7 +61,6 @@ func addBannerRotation(w http.ResponseWriter, r *http.Request, a app.Application
 	}
 
 	err = a.AddBannerToSlot(context.Background(), rotation.BannerID, rotation.SlotID)
-
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
@@ -75,11 +68,9 @@ func addBannerRotation(w http.ResponseWriter, r *http.Request, a app.Application
 	}
 
 	w.WriteHeader(http.StatusOK)
-
 }
 
 func deleteBannerRotation(w http.ResponseWriter, r *http.Request, a app.Application) {
-
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -96,7 +87,6 @@ func deleteBannerRotation(w http.ResponseWriter, r *http.Request, a app.Applicat
 	}
 
 	err = a.DeleteBannerFromSlot(context.Background(), rotation.BannerID, rotation.SlotID)
-
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
@@ -104,10 +94,21 @@ func deleteBannerRotation(w http.ResponseWriter, r *http.Request, a app.Applicat
 	}
 
 	w.WriteHeader(http.StatusOK)
-
 }
 
 func addBanner(w http.ResponseWriter, r *http.Request, a app.Application) {
+	handleAddItem(w, r, a, "banner")
+}
+
+func addSlot(w http.ResponseWriter, r *http.Request, a app.Application) {
+	handleAddItem(w, r, a, "slot")
+}
+
+func addGroup(w http.ResponseWriter, r *http.Request, a app.Application) {
+	handleAddItem(w, r, a, "group")
+}
+
+func handleAddItem(w http.ResponseWriter, r *http.Request, a app.Application, itemType string) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -115,25 +116,21 @@ func addBanner(w http.ResponseWriter, r *http.Request, a app.Application) {
 		return
 	}
 
-	var banner storage.Banner
-	err = json.Unmarshal(body, &banner)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
-		return
+	var item interface{}
+
+	switch itemType {
+	case "slot":
+		item, err = addSlotToDB(w, a, body)
+	case "group":
+		item, err = addGroupToDB(w, a, body)
+	case "banner":
+		item, err = addBannerToDB(w, a, body)
 	}
 
-	id, err := a.CreateBanner(context.Background(), banner.Descr)
-
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
 		return
 	}
-	banner.ID = id
-
-	data, err := json.Marshal(banner)
-
+	data, err := json.Marshal(item)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
@@ -144,41 +141,61 @@ func addBanner(w http.ResponseWriter, r *http.Request, a app.Application) {
 	w.Write(data)
 }
 
-func addSlot(w http.ResponseWriter, r *http.Request, a app.Application) {
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
-		return
-	}
-
+func addSlotToDB(w http.ResponseWriter, a app.Application, body []byte) (storage.Slot, error) {
 	var slot storage.Slot
-	err = json.Unmarshal(body, &slot)
+	err := json.Unmarshal(body, &slot)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))
-		return
+		return storage.Slot{}, err
 	}
 
 	id, err := a.CreateSlot(context.Background(), slot.Descr)
-
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
-		return
+		return storage.Slot{}, err
 	}
 	slot.ID = id
+	return slot, nil
+}
 
-	data, err := json.Marshal(slot)
+func addBannerToDB(w http.ResponseWriter, a app.Application, body []byte) (storage.Banner, error) {
+	var banner storage.Banner
+	err := json.Unmarshal(body, &banner)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return storage.Banner{}, err
+	}
 
+	id, err := a.CreateBanner(context.Background(), banner.Descr)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
-		return
+		return storage.Banner{}, err
+	}
+	banner.ID = id
+	return banner, nil
+}
+
+func addGroupToDB(w http.ResponseWriter, a app.Application, body []byte) (storage.SosialGroup, error) {
+	var group storage.SosialGroup
+	err := json.Unmarshal(body, &group)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
+		return storage.SosialGroup{}, err
 	}
 
-	w.WriteHeader(http.StatusOK)
-	w.Write(data)
+	id, err := a.CreateGroup(context.Background(), group.Descr)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return storage.SosialGroup{}, err
+	}
+	group.ID = id
+	return group, nil
 }
 
 func updateClickStat(w http.ResponseWriter, r *http.Request, a app.Application) {
@@ -198,7 +215,6 @@ func updateClickStat(w http.ResponseWriter, r *http.Request, a app.Application) 
 	}
 
 	err = a.UpdateClickStat(context.Background(), stat)
-
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
@@ -206,43 +222,6 @@ func updateClickStat(w http.ResponseWriter, r *http.Request, a app.Application) 
 	}
 
 	w.WriteHeader(http.StatusOK)
-}
-
-func addGroup(w http.ResponseWriter, r *http.Request, a app.Application) {
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
-		return
-	}
-
-	var group storage.SosialGroup
-	err = json.Unmarshal(body, &group)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
-		return
-	}
-
-	id, err := a.CreateGroup(context.Background(), group.Descr)
-
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-		return
-	}
-	group.ID = id
-
-	data, err := json.Marshal(group)
-
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Write(data)
 }
 
 func handleNotExpecterRequest(w http.ResponseWriter) {

@@ -30,7 +30,6 @@ func TestBannerStorage(t *testing.T) {
 			}()
 		}
 		wg.Wait()
-
 	})
 
 	t.Run("test slot db Creation", func(t *testing.T) {
@@ -51,7 +50,6 @@ func TestBannerStorage(t *testing.T) {
 			}()
 		}
 		wg.Wait()
-
 	})
 
 	t.Run("test group db Creation", func(t *testing.T) {
@@ -72,7 +70,6 @@ func TestBannerStorage(t *testing.T) {
 			}()
 		}
 		wg.Wait()
-
 	})
 
 	t.Run("test add banner to rotation test", func(t *testing.T) {
@@ -99,7 +96,7 @@ func TestBannerStorage(t *testing.T) {
 		}
 		wg.Wait()
 
-		//get banners by slot test
+		// get banners by slot test
 		bannerIDs, err := memory.GetBannersBySlot(context.Background(), 1)
 		require.NoErrorf(t, err, "unexpected error")
 		require.Equalf(t, len(bannerIDs), bannerCounter, "unexpected length")
@@ -137,6 +134,5 @@ func TestBannerStorage(t *testing.T) {
 		bannerIDs, err = memory.GetBannersBySlot(context.Background(), 1)
 		require.NoErrorf(t, err, "unexpected error")
 		require.Equalf(t, len(bannerIDs), bannerCounter-1, "unexpected length")
-
 	})
 }

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	_ "github.com/jackc/pgx/stdlib"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	"github.com/otus-murashko/banners-rotation/internal/storage"
@@ -43,17 +42,15 @@ func (s *Storage) Close() error {
 }
 
 func (s *Storage) GetBannersBySlot(ctx context.Context, slotID int) ([]int, error) {
-
 	sql := `SELECT banner
 	FROM rotation 
 	WHERE slot = $1`
 
-	rows, err := s.db.QueryxContext(ctx, sql, slotID)
+	rows, err := s.db.QueryContext(ctx, sql, slotID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-
 	banners := make([]int, 0)
 	errorsStr := make([]string, 0)
 	for rows.Next() {
@@ -70,19 +67,19 @@ func (s *Storage) GetBannersBySlot(ctx context.Context, slotID int) ([]int, erro
 	return banners, getQueryError(errorsStr)
 }
 
-func (s *Storage) GetBannersStat(ctx context.Context, slotID int, groupID int, bannerIDs []int) ([]storage.Statistic, error) {
-
+func (s *Storage) GetBannersStat(ctx context.Context, slotID int, groupID int, bannerIDs []int) (
+	[]storage.Statistic, error,
+) {
 	sql := `SELECT banner, slot, clicks, shows, s_group
 	FROM statistic 
 	WHERE slot = $1 AND s_group = $2 AND banner = any($3)`
 
 	rows, err := s.db.QueryxContext(ctx, sql, slotID, groupID, pq.Array(bannerIDs))
 	if err != nil {
-
-		fmt.Println("EEEEE", err)
 		return []storage.Statistic{}, err
 	}
 	defer rows.Close()
+	defer rows.Close().Error()
 
 	stats := make([]storage.Statistic, 0)
 	errorsStr := make([]string, 0)
@@ -101,7 +98,6 @@ func (s *Storage) GetBannersStat(ctx context.Context, slotID int, groupID int, b
 }
 
 func (s *Storage) UpdateShowStat(ctx context.Context, stat storage.Statistic) error {
-
 	sql := `UPDATE statistic SET 
 			shows = shows + 1
  			where banner = $1 AND slot = $2 AND s_group = $3;`
@@ -112,7 +108,6 @@ func (s *Storage) UpdateShowStat(ctx context.Context, stat storage.Statistic) er
 }
 
 func (s *Storage) UpdateClickStat(ctx context.Context, stat storage.Statistic) error {
-
 	sql := `UPDATE statistic SET 
 			clicks = clicks + 1
  			where banner = $1 AND slot = $2 AND s_group = $3;`
@@ -123,9 +118,7 @@ func (s *Storage) UpdateClickStat(ctx context.Context, stat storage.Statistic) e
 }
 
 func (s *Storage) AddBannerToSlot(ctx context.Context, bannerID int, slotID int) error {
-
 	tx, err := s.db.Begin()
-
 	if err != nil {
 		return err
 	}
@@ -135,7 +128,6 @@ func (s *Storage) AddBannerToSlot(ctx context.Context, bannerID int, slotID int)
 
 	// Insert to Slot
 	_, err = s.db.ExecContext(ctx, sql, bannerID, slotID)
-
 	if err != nil {
 		return err
 	}
@@ -144,7 +136,7 @@ func (s *Storage) AddBannerToSlot(ctx context.Context, bannerID int, slotID int)
 
 	sql = `SELECT id
 		   FROM social_group`
-	rows, err := s.db.QueryxContext(ctx, sql)
+	rows, err := s.db.QueryContext(ctx, sql)
 	if err != nil {
 		return err
 	}
@@ -180,7 +172,6 @@ func (s *Storage) AddBannerToSlot(ctx context.Context, bannerID int, slotID int)
 	// Create empty statistic for all sosial groups
 
 	_, err = s.db.ExecContext(ctx, sql, bannerID, slotID)
-
 	if err != nil {
 		return err
 	}
@@ -188,14 +179,12 @@ func (s *Storage) AddBannerToSlot(ctx context.Context, bannerID int, slotID int)
 	err = tx.Commit()
 
 	return err
-
 }
 
 func createInsertStatValues(groupIDs []int) string {
 	sb := strings.Builder{}
 
 	for i, groupID := range groupIDs {
-
 		sb.Write([]byte(fmt.Sprintf("($1, $2, %d)", groupID)))
 		if i < len(groupIDs)-1 {
 			sb.Write([]byte(", "))
@@ -206,11 +195,9 @@ func createInsertStatValues(groupIDs []int) string {
 }
 
 func (s *Storage) DeleteBannerFromSlot(ctx context.Context, bannerID int, slotID int) error {
-
 	sql := `DELETE from rotation where banner = $1 and slot = $2;`
 
 	_, err := s.db.ExecContext(ctx, sql, bannerID, slotID)
-
 	if err != nil {
 		return err
 	}
@@ -231,7 +218,6 @@ func (s *Storage) CreateGroup(ctx context.Context, desc string) (int, error) {
 }
 
 func createInstance(ctx context.Context, db *sqlx.DB, tNmae, desc string) (int, error) {
-
 	sql := fmt.Sprintf("INSERT INTO %s(descr) VALUES($1) RETURNING id", tNmae)
 
 	lastInsertID := 0

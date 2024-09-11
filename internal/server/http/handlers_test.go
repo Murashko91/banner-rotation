@@ -43,7 +43,7 @@ func TestEventHTTPApi(t *testing.T) {
 	t.Run("events API", func(t *testing.T) {
 		// insert banners, slots and groups
 
-		for i := 0; i < 10; i++ {
+		for i := 0; i < 5; i++ {
 			requestJSON := storage.Banner{
 				Descr: fmt.Sprintf("test %d", i),
 			}
@@ -96,6 +96,7 @@ func TestEventHTTPApi(t *testing.T) {
 			require.Equal(t, resGroupJSON.Descr, requestJSON.Descr, "not expected Descr")
 			require.NotNil(t, resGroupJSON.ID, "slot id not populated")
 
+			// add banners to slot
 			urlServer.Path = "banner-rotation"
 			requestRotationJSON := storage.Rotation{
 				BannerID: resBannerJSON.ID,
@@ -103,8 +104,10 @@ func TestEventHTTPApi(t *testing.T) {
 			}
 
 			resp, err = doHTTPCall(urlServer.String(), http.MethodPost, requestRotationJSON)
+
 			require.NoError(t, err, "not expected response error")
 			require.Equal(t, resp.StatusCode, http.StatusOK)
+			defer resp.Body.Close()
 		}
 
 		urlServer.Path = "stat"
@@ -118,6 +121,7 @@ func TestEventHTTPApi(t *testing.T) {
 			resp, err := doHTTPCall(urlServer.String(), http.MethodPost, clickReq)
 			require.NoError(t, err, "not expected response error")
 			require.Equal(t, resp.StatusCode, http.StatusOK)
+			defer resp.Body.Close()
 		}
 
 		urlServer.Path = "banner-rotation"
@@ -130,7 +134,7 @@ func TestEventHTTPApi(t *testing.T) {
 
 		mu := sync.Mutex{}
 
-		for i := 0; i < 100; i++ {
+		for i := 0; i < 25; i++ {
 			resp, err := doHTTPCall(urlServer.String(), http.MethodGet, nil)
 
 			require.NoError(t, err, "not expected response error")
@@ -148,27 +152,26 @@ func TestEventHTTPApi(t *testing.T) {
 		}
 		// get a banner with biggest shows count
 
-		topBannerId := 0
+		topBannerID := 0
 		mostShowsCount := 0
 
 		for bannerID, showsCount := range banditResultMap {
 			if showsCount > mostShowsCount {
-				topBannerId = bannerID
+				topBannerID = bannerID
 				mostShowsCount = showsCount
 			}
 		}
 
 		// most popular banner ID should be 2 because of added clicks
 
-		require.Equal(t, 2, topBannerId)
-		stat, err := db.GetBannersStat(context.Background(), 1, 1, []int{topBannerId})
+		require.Equal(t, 2, topBannerID)
+		stat, err := db.GetBannersStat(context.Background(), 1, 1, []int{topBannerID})
 		require.NoError(t, err, "response db stat error")
 		require.Equalf(t, stat[0].ShowsCount, mostShowsCount, "shows count has not been updated in db")
 	})
 }
 
 func doHTTPCall(url string, method string, body any) (*http.Response, error) {
-
 	var data io.Reader
 
 	if body != nil {

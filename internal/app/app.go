@@ -40,7 +40,9 @@ func (a App) GetBannersBySlot(ctx context.Context, slotID int) ([]int, error) {
 	return a.storage.GetBannersBySlot(ctx, slotID)
 }
 
-func (a App) GetBannersStat(ctx context.Context, slotID int, groupID int, bannerIDs []int) ([]storage.Statistic, error) {
+func (a App) GetBannersStat(
+	ctx context.Context, slotID int, groupID int, bannerIDs []int,
+) ([]storage.Statistic, error) {
 	return a.storage.GetBannersStat(ctx, slotID, groupID, bannerIDs)
 }
 
@@ -71,6 +73,7 @@ func (a App) GetBannerRotation(ctx context.Context, slotID, sGroupID int) (stora
 func (a App) UpdateShowStat(ctx context.Context, stat storage.Statistic) error {
 	return a.storage.UpdateShowStat(ctx, stat)
 }
+
 func (a App) UpdateClickStat(ctx context.Context, stat storage.Statistic) error {
 	return a.storage.UpdateClickStat(ctx, stat)
 }

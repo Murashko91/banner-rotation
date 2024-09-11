@@ -40,7 +40,9 @@ func (s Storage) GetBannersBySlot(_ context.Context, slotID int) ([]int, error) 
 	return result, nil
 }
 
-func (s Storage) GetBannersStat(ctx context.Context, slotID int, groupID int, bannerIDs []int) ([]storage.Statistic, error) {
+func (s Storage) GetBannersStat(
+	_ context.Context, slotID int, groupID int, bannerIDs []int,
+) ([]storage.Statistic, error) {
 	s.mutex.RLock()
 	result := make([]storage.Statistic, 0)
 
@@ -49,7 +51,6 @@ func (s Storage) GetBannersStat(ctx context.Context, slotID int, groupID int, ba
 	fmt.Println(s.statistics)
 
 	for _, stat := range s.statistics {
-
 		if stat.SlotID == slotID &&
 			slices.Contains(bannerIDs, stat.BannerID) &&
 			stat.SosialGroupID == groupID {
@@ -61,8 +62,7 @@ func (s Storage) GetBannersStat(ctx context.Context, slotID int, groupID int, ba
 	return result, nil
 }
 
-func (s *Storage) AddBannerToSlot(ctx context.Context, bannerID int, slotID int) error {
-
+func (s *Storage) AddBannerToSlot(_ context.Context, bannerID int, slotID int) error {
 	s.mutex.Lock()
 	hasValue := false
 	for _, rotation := range s.rotations {
@@ -73,7 +73,6 @@ func (s *Storage) AddBannerToSlot(ctx context.Context, bannerID int, slotID int)
 	}
 
 	if !hasValue {
-
 		s.rotations = append(s.rotations, storage.Rotation{BannerID: bannerID, SlotID: slotID})
 	}
 
@@ -99,16 +98,14 @@ func (s *Storage) AddBannerToSlot(ctx context.Context, bannerID int, slotID int)
 }
 
 func getAllGroupIDs(gMap map[int]storage.SosialGroup) []int {
-
 	result := make([]int, 0, len(gMap))
 	for id := range gMap {
 		result = append(result, id)
-
 	}
 	return result
 }
 
-func (s *Storage) DeleteBannerFromSlot(ctx context.Context, bannerID int, slotID int) error {
+func (s *Storage) DeleteBannerFromSlot(_ context.Context, bannerID int, slotID int) error {
 	s.mutex.Lock()
 	hasValue := false
 	position := 0
@@ -128,85 +125,81 @@ func (s *Storage) DeleteBannerFromSlot(ctx context.Context, bannerID int, slotID
 	return nil
 }
 
-func (s *Storage) CreateBanner(ctx context.Context, desc string) (int, error) {
+func (s *Storage) CreateBanner(_ context.Context, desc string) (int, error) {
 	s.mutex.Lock()
-	newId := getNewId(s.bannerMap)
-	s.bannerMap[newId] = storage.Banner{
-		ID:    newId,
+	newID := getnewID(s.bannerMap)
+	s.bannerMap[newID] = storage.Banner{
+		ID:    newID,
 		Descr: desc,
 	}
 	s.mutex.Unlock()
-	return newId, nil
+	return newID, nil
 }
 
-func (s *Storage) CreateSlot(ctx context.Context, desc string) (int, error) {
+func (s *Storage) CreateSlot(_ context.Context, desc string) (int, error) {
 	s.mutex.Lock()
-	newId := getNewId(s.slotMap)
-	s.slotMap[newId] = storage.Slot{
-		ID:    newId,
+	newID := getnewID(s.slotMap)
+	s.slotMap[newID] = storage.Slot{
+		ID:    newID,
 		Descr: desc,
 	}
 	s.mutex.Unlock()
-	return newId, nil
+	return newID, nil
 }
 
-func (s *Storage) CreateGroup(ctx context.Context, desc string) (int, error) {
-
+func (s *Storage) CreateGroup(_ context.Context, desc string) (int, error) {
 	s.mutex.Lock()
-	newId := getNewId(s.groupMap)
-	s.groupMap[newId] = storage.SosialGroup{
-		ID:    newId,
+	newID := getnewID(s.groupMap)
+	s.groupMap[newID] = storage.SosialGroup{
+		ID:    newID,
 		Descr: desc,
 	}
 	s.mutex.Unlock()
-	return newId, nil
+	return newID, nil
 }
 
-func (s *Storage) UpdateShowStat(ctx context.Context, showStat storage.Statistic) error {
+func (s *Storage) UpdateShowStat(_ context.Context, showStat storage.Statistic) error {
 	s.mutex.Lock()
-	var statInDb storage.Statistic
+	var statInDB storage.Statistic
 	hasValue := false
 	pos := 0
 	for i, stat := range s.statistics {
-
 		if stat.SlotID == showStat.SlotID &&
 			stat.BannerID == showStat.BannerID &&
 			stat.SosialGroupID == showStat.SosialGroupID {
 			pos = i
 			hasValue = true
-			statInDb = stat
+			statInDB = stat
 		}
 	}
 
 	if hasValue {
-		statInDb.ShowsCount++
-		s.statistics[pos] = statInDb
+		statInDB.ShowsCount++
+		s.statistics[pos] = statInDB
 	}
 
 	s.mutex.Unlock()
 	return nil
 }
 
-func (s *Storage) UpdateClickStat(ctx context.Context, showStat storage.Statistic) error {
-
+func (s *Storage) UpdateClickStat(_ context.Context, showStat storage.Statistic) error {
 	s.mutex.Lock()
-	var statInDb storage.Statistic
+	var statInDB storage.Statistic
 	hasValue := false
 	pos := 0
 	for i, stat := range s.statistics {
-
 		if stat.SlotID == showStat.SlotID &&
 			stat.BannerID == showStat.BannerID &&
 			stat.SosialGroupID == showStat.SosialGroupID {
 			pos = i
 			hasValue = true
-			statInDb = stat
+			statInDB = stat
 		}
 	}
 
 	if hasValue {
-		statInDb.ClicksCount++
-		s.statistics[pos] = statInDb
+		statInDB.ClicksCount++
+		s.statistics[pos] = statInDB
 	}
 	s.mutex.Unlock()
 
@@ -214,7 +207,6 @@ func (s *Storage) UpdateClickStat(ctx context.Context, showStat storage.Statisti
 }
 
 func NewMemoryStorage() *Storage {
-
 	return &Storage{
 		slotMap:    make(map[int]storage.Slot),
 		bannerMap:  make(map[int]storage.Banner),
@@ -225,14 +217,13 @@ func NewMemoryStorage() *Storage {
 	}
 }
 
-func getNewId[V any](in map[int]V) int {
-
-	maxId := 0
+func getnewID[V any](in map[int]V) int {
+	maxID := 0
 	for key := range in {
-		if key > maxId {
-			maxId = key
+		if key > maxID {
+			maxID = key
 		}
 	}
 
-	return maxId + 1
+	return maxID + 1
 }

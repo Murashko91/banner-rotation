@@ -7,31 +7,27 @@ import (
 	"github.com/otus-murashko/banners-rotation/internal/storage"
 )
 
-type BannerSelector interface {
+type Selector interface {
 	GetBanner(ctx context.Context, slotID, sGroupID int) (storage.Banner, error)
 }
 
-type BannerBanditSelector struct {
+type BanditSelector struct {
 	db storage.Storage
 }
 
-func NewBannerBanditSelector(db storage.Storage) BannerBanditSelector {
-	return BannerBanditSelector{db: db}
-
+func NewBannerBanditSelector(db storage.Storage) BanditSelector {
+	return BanditSelector{db: db}
 }
 
-func (bs BannerBanditSelector) GetBanner(ctx context.Context, slotID, sGroupID int) (storage.Banner, error) {
-
+func (bs BanditSelector) GetBanner(ctx context.Context, slotID, sGroupID int) (storage.Banner, error) {
 	// get all statistic for the banners and social group
 
 	bannerIDs, err := bs.db.GetBannersBySlot(ctx, slotID)
-
 	if err != nil {
 		return storage.Banner{}, err
 	}
 
 	stats, err := bs.db.GetBannersStat(ctx, slotID, sGroupID, bannerIDs)
-
 	if err != nil {
 		return storage.Banner{}, err
 	}
@@ -41,11 +37,9 @@ func (bs BannerBanditSelector) GetBanner(ctx context.Context, slotID, sGroupID i
 	bs.db.UpdateShowStat(ctx, bestStat) // increase shows count in db
 
 	return storage.Banner{ID: bestStat.BannerID}, nil
-
 }
 
 func getBestBannerStat(stats []storage.Statistic) storage.Statistic {
-
 	totalShowsCount := 0
 
 	// count total shows
@@ -75,5 +69,4 @@ func getBestBannerStat(stats []storage.Statistic) storage.Statistic {
 	}
 
 	return bestStat
-
 }

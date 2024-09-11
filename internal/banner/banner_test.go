@@ -101,7 +101,5 @@ func TestPickBanner(t *testing.T) {
 }
 
 func getBanner(inputs []storage.Statistic) int {
-
 	return getBestBannerStat(inputs).BannerID
-
 }
