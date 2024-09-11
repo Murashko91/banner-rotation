@@ -17,6 +17,7 @@ type BannerBanditSelector struct {
 
 func NewBannerBanditSelector(db storage.Storage) BannerBanditSelector {
 	return BannerBanditSelector{db: db}
+
 }
 
 func (bs BannerBanditSelector) GetBanner(ctx context.Context, slotID, sGroupID int) (storage.Banner, error) {
@@ -34,6 +35,16 @@ func (bs BannerBanditSelector) GetBanner(ctx context.Context, slotID, sGroupID i
 	if err != nil {
 		return storage.Banner{}, err
 	}
+
+	bestStat := getBestBannerStat(stats)
+
+	bs.db.UpdateShowStat(ctx, bestStat) // increase shows count in db
+
+	return storage.Banner{ID: bestStat.BannerID}, nil
+
+}
+
+func getBestBannerStat(stats []storage.Statistic) storage.Statistic {
 
 	totalShowsCount := 0
 
@@ -63,8 +74,6 @@ func (bs BannerBanditSelector) GetBanner(ctx context.Context, slotID, sGroupID i
 		}
 	}
 
-	bs.db.UpdateShowStat(ctx, bestStat)
-
-	return storage.Banner{ID: bestStat.BannerID}, nil
+	return bestStat
 
 }

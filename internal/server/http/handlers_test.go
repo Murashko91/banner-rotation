@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"sync"
 	"testing"
 
 	"github.com/otus-murashko/banners-rotation/internal/app"
@@ -38,19 +39,17 @@ func TestEventHTTPApi(t *testing.T) {
 
 	server := httptest.NewServer(bannerRouter)
 	urlServer, _ := url.Parse(server.URL)
-	urlServer.Path = "banner"
 
 	t.Run("events API", func(t *testing.T) {
-		// insert banners
+		// insert banners, slots and groups
 
-		for i := 0; i < 30; i++ {
+		for i := 0; i < 10; i++ {
 			requestJSON := storage.Banner{
 				Descr: fmt.Sprintf("test %d", i),
 			}
 
-			reqBody, err := json.Marshal(requestJSON)
-			require.NoError(t, err, "not expected body marshal error")
-			resp, err := doHTTPCall(urlServer.String(), http.MethodPost, bytes.NewReader(reqBody))
+			urlServer.Path = "banner"
+			resp, err := doHTTPCall(urlServer.String(), http.MethodPost, requestJSON)
 			require.NoError(t, err, "not expected request error")
 			require.Equal(t, resp.StatusCode, http.StatusOK)
 
@@ -58,28 +57,129 @@ func TestEventHTTPApi(t *testing.T) {
 			defer resp.Body.Close()
 			require.NoError(t, err, "not expected read body error")
 
-			var resJSON storage.Banner
-			err = json.Unmarshal(resBody, &resJSON)
+			var resBannerJSON storage.Banner
+			err = json.Unmarshal(resBody, &resBannerJSON)
 			require.NoError(t, err, "response unmarshal error")
-			require.Equal(t, resJSON.Descr, requestJSON.Descr, "not expected Descr")
-			require.NotNil(t, resJSON.ID, "banner id not populated")
+			require.Equal(t, resBannerJSON.Descr, requestJSON.Descr, "not expected Descr")
+			require.NotNil(t, resBannerJSON.ID, "banner id not populated")
+
+			// insert slot
+			urlServer.Path = "slot"
+
+			resp, err = doHTTPCall(urlServer.String(), http.MethodPost, requestJSON)
+			require.NoError(t, err, "not expected request error")
+			require.Equal(t, resp.StatusCode, http.StatusOK)
+
+			resBody, err = io.ReadAll(resp.Body)
+			defer resp.Body.Close()
+			require.NoError(t, err, "not expected read body error")
+
+			var resSlotJSON storage.Slot
+			err = json.Unmarshal(resBody, &resSlotJSON)
+			require.NoError(t, err, "response unmarshal error")
+			require.Equal(t, resSlotJSON.Descr, requestJSON.Descr, "not expected Descr")
+			require.NotNil(t, resSlotJSON.ID, "slot id not populated")
+
+			// insert groups
+			urlServer.Path = "group"
+			resp, err = doHTTPCall(urlServer.String(), http.MethodPost, requestJSON)
+			require.NoError(t, err, "not expected request error")
+			require.Equal(t, resp.StatusCode, http.StatusOK)
+
+			resBody, err = io.ReadAll(resp.Body)
+			defer resp.Body.Close()
+			require.NoError(t, err, "not expected read body error")
+
+			var resGroupJSON storage.Slot
+			err = json.Unmarshal(resBody, &resGroupJSON)
+			require.NoError(t, err, "response unmarshal error")
+			require.Equal(t, resGroupJSON.Descr, requestJSON.Descr, "not expected Descr")
+			require.NotNil(t, resGroupJSON.ID, "slot id not populated")
+
+			urlServer.Path = "banner-rotation"
+			requestRotationJSON := storage.Rotation{
+				BannerID: resBannerJSON.ID,
+				SlotID:   1,
+			}
+
+			resp, err = doHTTPCall(urlServer.String(), http.MethodPost, requestRotationJSON)
+			require.NoError(t, err, "not expected response error")
+			require.Equal(t, resp.StatusCode, http.StatusOK)
 		}
 
-		// insert slots
+		urlServer.Path = "stat"
+		clickReq := storage.Statistic{
+			BannerID:      2,
+			SosialGroupID: 1,
+			SlotID:        1,
+		}
 
-		// insert groups
+		for i := 0; i < 5; i++ {
+			resp, err := doHTTPCall(urlServer.String(), http.MethodPost, clickReq)
+			require.NoError(t, err, "not expected response error")
+			require.Equal(t, resp.StatusCode, http.StatusOK)
+		}
 
-		// insert banner to slot
+		urlServer.Path = "banner-rotation"
+		banditResultMap := make(map[int]int)
 
-		// Tests clicks
+		params := urlServer.Query()
+		params.Add("slot_id", "1")
+		params.Add("group_id", "1")
+		urlServer.RawQuery = params.Encode()
 
-		// Test banner bandit
+		mu := sync.Mutex{}
 
+		for i := 0; i < 100; i++ {
+			resp, err := doHTTPCall(urlServer.String(), http.MethodGet, nil)
+
+			require.NoError(t, err, "not expected response error")
+			require.Equal(t, resp.StatusCode, http.StatusOK)
+			resBody, err := io.ReadAll(resp.Body)
+			require.NoError(t, err, "not expected read body error")
+			defer resp.Body.Close()
+			var respBanner storage.Banner
+			err = json.Unmarshal(resBody, &respBanner)
+			require.NoError(t, err, "response unmarshal error")
+
+			mu.Lock()
+			banditResultMap[respBanner.ID]++
+			mu.Unlock()
+		}
+		// get a banner with biggest shows count
+
+		topBannerId := 0
+		mostShowsCount := 0
+
+		for bannerID, showsCount := range banditResultMap {
+			if showsCount > mostShowsCount {
+				topBannerId = bannerID
+				mostShowsCount = showsCount
+			}
+		}
+
+		// most popular banner ID should be 2 because of added clicks
+
+		require.Equal(t, 2, topBannerId)
+		stat, err := db.GetBannersStat(context.Background(), 1, 1, []int{topBannerId})
+		require.NoError(t, err, "response db stat error")
+		require.Equalf(t, stat[0].ShowsCount, mostShowsCount, "shows count has not been updated in db")
 	})
 }
 
-func doHTTPCall(url string, method string, body io.Reader) (*http.Response, error) {
-	req, err := http.NewRequestWithContext(context.Background(), method, url, body)
+func doHTTPCall(url string, method string, body any) (*http.Response, error) {
+
+	var data io.Reader
+
+	if body != nil {
+		reqBody, err := json.Marshal(body)
+		if err != nil {
+			return nil, err
+		}
+		data = bytes.NewReader(reqBody)
+	}
+
+	req, err := http.NewRequestWithContext(context.Background(), method, url, data)
 	if err != nil {
 		return nil, err
 	}
