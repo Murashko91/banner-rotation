@@ -32,7 +32,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/storage.Banner"
+                            "$ref": "#/definitions/internalhttp.Item"
                         }
                     }
                 ],
@@ -42,9 +42,120 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/storage.Banner"
+                                "$ref": "#/definitions/internalhttp.ItemResult"
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/banner-rotation": {
+            "get": {
+                "description": "Get Banner Rotation",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Banner-Rotation"
+                ],
+                "summary": "Get best banner for the slot and group (Bandit algoritm)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "slot id",
+                        "name": "slot_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "slot id",
+                        "name": "group_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "put": {
+                "description": "Add Banner Rotation. Increase clicks count to one",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Banner-Rotation"
+                ],
+                "summary": "Update Click Banner stat",
+                "parameters": [
+                    {
+                        "description": "JSON Banner Stat. Clicks c",
+                        "name": "stat",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internalhttp.Statistic"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "post": {
+                "description": "Add Banner Rotation",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Banner-Rotation"
+                ],
+                "summary": "Add Banner to a Slot",
+                "parameters": [
+                    {
+                        "description": "JSON Baneer Rotation",
+                        "name": "banner_rotation",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/storage.Rotation"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete Banner Rotation",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Banner-Rotation"
+                ],
+                "summary": "Delete Banner from a Slot",
+                "parameters": [
+                    {
+                        "description": "JSON Baneer Rotation",
+                        "name": "banner_rotation",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/storage.Rotation"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
                     }
                 }
             }
@@ -61,12 +172,12 @@ const docTemplate = `{
                 "summary": "Create New Social Group",
                 "parameters": [
                     {
-                        "description": "Social Group JSON(ID field could be empty for request)",
+                        "description": "Social Group JSON",
                         "name": "sosial_group",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/storage.SosialGroup"
+                            "$ref": "#/definitions/internalhttp.Item"
                         }
                     }
                 ],
@@ -76,7 +187,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/storage.SosialGroup"
+                                "$ref": "#/definitions/internalhttp.ItemResult"
                             }
                         }
                     }
@@ -95,12 +206,12 @@ const docTemplate = `{
                 "summary": "Create New Slot",
                 "parameters": [
                     {
-                        "description": "SlotJSON(ID field could be empty for request)",
+                        "description": "SlotJSON",
                         "name": "slot",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/storage.Slot"
+                            "$ref": "#/definitions/internalhttp.Item"
                         }
                     }
                 ],
@@ -110,7 +221,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/storage.Slot"
+                                "$ref": "#/definitions/internalhttp.ItemResult"
                             }
                         }
                     }
@@ -119,35 +230,43 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "storage.Banner": {
+        "internalhttp.Item": {
             "type": "object",
             "properties": {
                 "descr": {
                     "type": "string"
-                },
+                }
+            }
+        },
+        "internalhttp.ItemResult": {
+            "type": "object",
+            "properties": {
                 "id": {
                     "type": "integer"
                 }
             }
         },
-        "storage.Slot": {
+        "internalhttp.Statistic": {
             "type": "object",
             "properties": {
-                "descr": {
-                    "type": "string"
+                "bannerID": {
+                    "type": "integer"
                 },
-                "id": {
+                "slotID": {
+                    "type": "integer"
+                },
+                "socialGroupID": {
                     "type": "integer"
                 }
             }
         },
-        "storage.SosialGroup": {
+        "storage.Rotation": {
             "type": "object",
             "properties": {
-                "descr": {
-                    "type": "string"
+                "bannerID": {
+                    "type": "integer"
                 },
-                "id": {
+                "slotID": {
                     "type": "integer"
                 }
             }

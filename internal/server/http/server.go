@@ -21,6 +21,20 @@ type ServerConf struct {
 	Port int
 }
 
+type Item struct {
+	Descr string
+}
+
+type ItemResult struct {
+	ID int
+}
+
+type Statistic struct {
+	BannerID      int
+	SocialGroupID int
+	SlotID        int
+}
+
 func NewServer(app app.Application, conf config.Server) *Server {
 	bannerRouter := http.NewServeMux()
 

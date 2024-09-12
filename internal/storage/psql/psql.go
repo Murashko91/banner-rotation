@@ -79,7 +79,6 @@ func (s *Storage) GetBannersStat(ctx context.Context, slotID int, groupID int, b
 		return []storage.Statistic{}, err
 	}
 	defer rows.Close()
-	defer rows.Close().Error()
 
 	stats := make([]storage.Statistic, 0)
 	errorsStr := make([]string, 0)
