@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"time"
 
+	httpSwagger "github.com/swaggo/http-swagger/v2"
+
 	"github.com/otus-murashko/banners-rotation/internal/app"
 	"github.com/otus-murashko/banners-rotation/internal/config"
 )
@@ -27,11 +29,16 @@ func NewServer(app app.Application, conf config.Server) *Server {
 		app: app,
 	}
 
+	swagHandler := httpSwagger.Handler(
+		httpSwagger.URL(fmt.Sprintf("http://%s:%d/swagger/doc.json", conf.Host, conf.Port)))
+
 	bannerRouter.Handle("/banner-rotation", loggingMiddleware(http.HandlerFunc(appHandler.bannerRotationHandler)))
 	bannerRouter.Handle("/banner", loggingMiddleware(http.HandlerFunc(appHandler.bannerHandler)))
 	bannerRouter.Handle("/slot", loggingMiddleware(http.HandlerFunc(appHandler.slotHandler)))
 	bannerRouter.Handle("/group", loggingMiddleware(http.HandlerFunc(appHandler.groupHandler)))
 	bannerRouter.Handle("/stat", loggingMiddleware(http.HandlerFunc(appHandler.statHandler)))
+	bannerRouter.Handle("/swagger/", http.HandlerFunc(swagHandler))
+	//bannerRouter.Handle()
 
 	httpServer := &http.Server{
 		ReadHeaderTimeout: 3 * time.Second,
