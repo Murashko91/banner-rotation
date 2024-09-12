@@ -111,9 +111,9 @@ func TestEventHTTPApi(t *testing.T) {
 		}
 
 		urlServer.Path = "stat"
-		clickReq := storage.Statistic{
+		clickReq := Statistic{
 			BannerID:      2,
-			SosialGroupID: 1,
+			SocialGroupID: 1,
 			SlotID:        1,
 		}
 

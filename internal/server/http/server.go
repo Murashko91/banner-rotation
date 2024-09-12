@@ -26,7 +26,8 @@ type Item struct {
 }
 
 type ItemResult struct {
-	ID int
+	ID    int
+	Descr string
 }
 
 type Statistic struct {

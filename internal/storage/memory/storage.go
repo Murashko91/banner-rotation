@@ -2,7 +2,6 @@ package memory
 
 import (
 	"context"
-	"fmt"
 	"slices"
 	"sync"
 
@@ -46,14 +45,10 @@ func (s Storage) GetBannersStat(
 	s.mutex.RLock()
 	result := make([]storage.Statistic, 0)
 
-	fmt.Println(".statistics")
-
-	fmt.Println(s.statistics)
-
 	for _, stat := range s.statistics {
 		if stat.SlotID == slotID &&
 			slices.Contains(bannerIDs, stat.BannerID) &&
-			stat.SosialGroupID == groupID {
+			stat.SocialGroupID == groupID {
 			result = append(result, stat)
 		}
 	}
@@ -81,7 +76,7 @@ func (s *Storage) AddBannerToSlot(_ context.Context, bannerID int, slotID int) e
 	for _, stat := range s.statistics {
 		if stat.SlotID == slotID &&
 			stat.BannerID == bannerID {
-			existsStatGroupIDs = append(existsStatGroupIDs, stat.SosialGroupID)
+			existsStatGroupIDs = append(existsStatGroupIDs, stat.SocialGroupID)
 		}
 	}
 
@@ -89,7 +84,7 @@ func (s *Storage) AddBannerToSlot(_ context.Context, bannerID int, slotID int) e
 	for _, groupID := range getAllGroupIDs(s.groupMap) {
 		if !slices.Contains(existsStatGroupIDs, groupID) {
 			s.statistics = append(s.statistics,
-				storage.Statistic{BannerID: bannerID, SlotID: slotID, SosialGroupID: groupID})
+				storage.Statistic{BannerID: bannerID, SlotID: slotID, SocialGroupID: groupID})
 		}
 	}
 
@@ -166,7 +161,7 @@ func (s *Storage) UpdateShowStat(_ context.Context, showStat storage.Statistic) 
 	for i, stat := range s.statistics {
 		if stat.SlotID == showStat.SlotID &&
 			stat.BannerID == showStat.BannerID &&
-			stat.SosialGroupID == showStat.SosialGroupID {
+			stat.SocialGroupID == showStat.SocialGroupID {
 			pos = i
 			hasValue = true
 			statInDB = stat
@@ -190,7 +185,7 @@ func (s *Storage) UpdateClickStat(_ context.Context, showStat storage.Statistic)
 	for i, stat := range s.statistics {
 		if stat.SlotID == showStat.SlotID &&
 			stat.BannerID == showStat.BannerID &&
-			stat.SosialGroupID == showStat.SosialGroupID {
+			stat.SocialGroupID == showStat.SocialGroupID {
 			pos = i
 			hasValue = true
 			statInDB = stat

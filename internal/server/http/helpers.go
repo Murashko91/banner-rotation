@@ -197,7 +197,7 @@ func handleAddItem(w http.ResponseWriter, r *http.Request, a app.Application, it
 		w.Write([]byte(err.Error()))
 		return
 	}
-	data, err := json.Marshal(ItemResult{ID: id})
+	data, err := json.Marshal(ItemResult{ID: id, Descr: inputItem.Descr})
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
@@ -236,7 +236,7 @@ func updateClickStat(w http.ResponseWriter, r *http.Request, a app.Application) 
 	err = a.UpdateClickStat(context.Background(), storage.Statistic{
 		BannerID:      stat.BannerID,
 		SlotID:        stat.SlotID,
-		SosialGroupID: stat.SocialGroupID,
+		SocialGroupID: stat.SocialGroupID,
 	})
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

@@ -41,5 +41,5 @@ type Statistic struct {
 	SlotID        int `db:"slot"`
 	ClicksCount   int `db:"clicks"`
 	ShowsCount    int `db:"shows"`
-	SosialGroupID int `db:"s_group"`
+	SocialGroupID int `db:"s_group"`
 }

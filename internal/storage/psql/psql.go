@@ -101,7 +101,7 @@ func (s *Storage) UpdateShowStat(ctx context.Context, stat storage.Statistic) er
 			shows = shows + 1
  			where banner = $1 AND slot = $2 AND s_group = $3;`
 
-	_, err := s.db.ExecContext(ctx, sql, stat.BannerID, stat.SlotID, stat.SosialGroupID)
+	_, err := s.db.ExecContext(ctx, sql, stat.BannerID, stat.SlotID, stat.SocialGroupID)
 
 	return err
 }
@@ -111,7 +111,7 @@ func (s *Storage) UpdateClickStat(ctx context.Context, stat storage.Statistic) e
 			clicks = clicks + 1
  			where banner = $1 AND slot = $2 AND s_group = $3;`
 
-	_, err := s.db.ExecContext(ctx, sql, stat.BannerID, stat.SlotID, stat.SosialGroupID)
+	_, err := s.db.ExecContext(ctx, sql, stat.BannerID, stat.SlotID, stat.SocialGroupID)
 
 	return err
 }
@@ -167,7 +167,6 @@ func (s *Storage) AddBannerToSlot(ctx context.Context, bannerID int, slotID int)
 		createInsertStatValues(groupIDs) +
 		"ON CONFLICT (banner, slot, s_group) DO NOTHING "
 
-	fmt.Println(sql)
 	// Create empty statistic for all sosial groups
 
 	_, err = s.db.ExecContext(ctx, sql, bannerID, slotID)
