@@ -6,10 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	httpSwagger "github.com/swaggo/http-swagger/v2"
-
 	"github.com/otus-murashko/banners-rotation/internal/app"
 	"github.com/otus-murashko/banners-rotation/internal/config"
+	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
 type Server struct {
@@ -37,8 +36,8 @@ func NewServer(app app.Application, conf config.Server) *Server {
 	bannerRouter.Handle("/slot", loggingMiddleware(http.HandlerFunc(appHandler.slotHandler)))
 	bannerRouter.Handle("/group", loggingMiddleware(http.HandlerFunc(appHandler.groupHandler)))
 	bannerRouter.Handle("/stat", loggingMiddleware(http.HandlerFunc(appHandler.statHandler)))
-	bannerRouter.Handle("/swagger/", http.HandlerFunc(swagHandler))
-	//bannerRouter.Handle()
+	bannerRouter.Handle("/swagger/", swagHandler)
+	// bannerRouter.Handle()
 
 	httpServer := &http.Server{
 		ReadHeaderTimeout: 3 * time.Second,

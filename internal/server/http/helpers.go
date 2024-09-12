@@ -11,7 +11,7 @@ import (
 	"github.com/otus-murashko/banners-rotation/internal/storage"
 )
 
-// @Summary
+// @Summary.
 func getBannerRotation(w http.ResponseWriter, r *http.Request, a app.Application) {
 	slotID, err := strconv.Atoi(r.URL.Query().Get("slot_id"))
 	if err != nil {
