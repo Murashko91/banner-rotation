@@ -37,7 +37,6 @@ func NewServer(app app.Application, conf config.Server) *Server {
 	bannerRouter.Handle("/group", loggingMiddleware(http.HandlerFunc(appHandler.groupHandler)))
 	bannerRouter.Handle("/stat", loggingMiddleware(http.HandlerFunc(appHandler.statHandler)))
 	bannerRouter.Handle("/swagger/", swagHandler)
-	// bannerRouter.Handle()
 
 	httpServer := &http.Server{
 		ReadHeaderTimeout: 3 * time.Second,

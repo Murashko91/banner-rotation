@@ -9,7 +9,7 @@ import (
 	"time"
 
 	_ "github.com/jackc/pgx/stdlib"
-	_ "github.com/otus-murashko/banners-rotation/cmd/docs"
+	_ "github.com/otus-murashko/banners-rotation/docs"
 	"github.com/otus-murashko/banners-rotation/internal/app"
 	"github.com/otus-murashko/banners-rotation/internal/config"
 	internalhttp "github.com/otus-murashko/banners-rotation/internal/server/http"
@@ -21,9 +21,10 @@ func init() {
 	flag.StringVar(&configFile, "conf", "./../configs/config.yaml", "Path to configuration file")
 }
 
-// @title Banners-Rotation service
-// @version 0.0.1
-// Banners-Rotation service Otus final project
+// @title Banners-Rotation API
+// @version 1.0
+// @description API Server for Banners-Rotation API
+
 // @host localhost:8888
 // @BasePath /
 

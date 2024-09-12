@@ -36,6 +36,10 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
+      - name: Install Tools
+        run: |
+          go install github.com/go-swagger/go-swagger/cmd/swagger@latest
+        
       - name: Build service binary
         run: go build -o banner-rotation ./cmd/
 
@@ -53,6 +57,10 @@ jobs:
       - name: make lint
         run: make lint
         working-directory: .
+
+      - name: Install Tools
+        run: |
+          go install github.com/go-swagger/go-swagger/cmd/swagger@latest
 
       - name: make build
         run: make build

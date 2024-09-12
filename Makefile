@@ -10,7 +10,7 @@ LDFLAGS := -X main.release="develop" -X main.buildDate=$(shell date -u +%Y-%m-%d
 build:
 	go build -v -o $(BIN) -ldflags "$(LDFLAGS)" ./cmd/.
 	
-run: build
+run: swag-init build 
 	$(BIN) -conf ./configs/config.yaml
 
 db-up:
@@ -38,5 +38,7 @@ install-lint-deps:
 
 lint: install-lint-deps
 	golangci-lint run ./...
+swag-init:
+	swag init -d ./cmd/,./internal/server/http/,./internal/storage -g main.go --parseDependency
 
-.PHONY: build run build-img run-img version test lint
+.PHONY: build run build-img run-img version test lint swag-init

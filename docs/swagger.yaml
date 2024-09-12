@@ -1,0 +1,97 @@
+basePath: /
+definitions:
+  storage.Banner:
+    properties:
+      descr:
+        type: string
+      id:
+        type: integer
+    type: object
+  storage.Slot:
+    properties:
+      descr:
+        type: string
+      id:
+        type: integer
+    type: object
+  storage.SosialGroup:
+    properties:
+      descr:
+        type: string
+      id:
+        type: integer
+    type: object
+host: localhost:8888
+info:
+  contact: {}
+  description: API Server for Banners-Rotation API
+  title: Banners-Rotation API
+  version: "1.0"
+paths:
+  /banner:
+    post:
+      description: Responds with the instance with added baneer ID
+      parameters:
+      - description: Banner JSON(ID field could be empty for request)
+        in: body
+        name: banner
+        required: true
+        schema:
+          $ref: '#/definitions/storage.Banner'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/storage.Banner'
+            type: array
+      summary: Create New Banner
+      tags:
+      - Banner
+  /group:
+    post:
+      description: Responds with the instance with added baneer ID
+      parameters:
+      - description: Social Group JSON(ID field could be empty for request)
+        in: body
+        name: sosial_group
+        required: true
+        schema:
+          $ref: '#/definitions/storage.SosialGroup'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/storage.SosialGroup'
+            type: array
+      summary: Create New Social Group
+      tags:
+      - Social Group
+  /slot:
+    post:
+      description: Responds with the instance with added Slot ID
+      parameters:
+      - description: SlotJSON(ID field could be empty for request)
+        in: body
+        name: slot
+        required: true
+        schema:
+          $ref: '#/definitions/storage.Slot'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/storage.Slot'
+            type: array
+      summary: Create New Slot
+      tags:
+      - Slot
+swagger: "2.0"

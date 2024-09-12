@@ -11,7 +11,8 @@ import (
 	"github.com/otus-murashko/banners-rotation/internal/storage"
 )
 
-// @Summary.
+type Book struct{}
+
 func getBannerRotation(w http.ResponseWriter, r *http.Request, a app.Application) {
 	slotID, err := strconv.Atoi(r.URL.Query().Get("slot_id"))
 	if err != nil {
@@ -142,6 +143,15 @@ func handleAddItem(w http.ResponseWriter, r *http.Request, a app.Application, it
 	w.Write(data)
 }
 
+// Add Slot
+// addSlotToDB             godoc
+// @Summary      Create New Slot
+// @Description  Responds with the instance with added Slot ID
+// @Tags         Slot
+// @Produce      json
+// @Param        slot  body    storage.Slot  true  "SlotJSON(ID field could be empty for request)"
+// @Success      200  {array}  storage.Slot
+// @Router       /slot [post].
 func addSlotToDB(w http.ResponseWriter, a app.Application, body []byte) (storage.Slot, error) {
 	var slot storage.Slot
 	err := json.Unmarshal(body, &slot)
@@ -161,6 +171,15 @@ func addSlotToDB(w http.ResponseWriter, a app.Application, body []byte) (storage
 	return slot, nil
 }
 
+// Add Banner
+// addBannerToDB             godoc
+// @Summary      Create New Banner
+// @Description  Responds with the instance with added baneer ID
+// @Tags         Banner
+// @Produce      json
+// @Param        banner  body    storage.Banner  true  "Banner JSON(ID field could be empty for request)"
+// @Success      200  {array}  storage.Banner
+// @Router       /banner [post].
 func addBannerToDB(w http.ResponseWriter, a app.Application, body []byte) (storage.Banner, error) {
 	var banner storage.Banner
 	err := json.Unmarshal(body, &banner)
@@ -180,6 +199,15 @@ func addBannerToDB(w http.ResponseWriter, a app.Application, body []byte) (stora
 	return banner, nil
 }
 
+// Add Group
+// addGroupToDB           godoc
+// @Summary      Create New Social Group
+// @Description  Responds with the instance with added baneer ID
+// @Tags         Social Group
+// @Produce      json
+// @Param        sosial_group body storage.SosialGroup  true  "Social Group JSON(ID field could be empty for request)"
+// @Success      200  {array}  storage.SosialGroup
+// @Router       /group [post].
 func addGroupToDB(w http.ResponseWriter, a app.Application, body []byte) (storage.SosialGroup, error) {
 	var group storage.SosialGroup
 	err := json.Unmarshal(body, &group)

@@ -1,0 +1,150 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API Server for Banners-Rotation API",
+        "title": "Banners-Rotation API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8888",
+    "basePath": "/",
+    "paths": {
+        "/banner": {
+            "post": {
+                "description": "Responds with the instance with added baneer ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Banner"
+                ],
+                "summary": "Create New Banner",
+                "parameters": [
+                    {
+                        "description": "Banner JSON(ID field could be empty for request)",
+                        "name": "banner",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/storage.Banner"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/storage.Banner"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/group": {
+            "post": {
+                "description": "Responds with the instance with added baneer ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Social Group"
+                ],
+                "summary": "Create New Social Group",
+                "parameters": [
+                    {
+                        "description": "Social Group JSON(ID field could be empty for request)",
+                        "name": "sosial_group",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/storage.SosialGroup"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/storage.SosialGroup"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/slot": {
+            "post": {
+                "description": "Responds with the instance with added Slot ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Slot"
+                ],
+                "summary": "Create New Slot",
+                "parameters": [
+                    {
+                        "description": "SlotJSON(ID field could be empty for request)",
+                        "name": "slot",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/storage.Slot"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/storage.Slot"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "storage.Banner": {
+            "type": "object",
+            "properties": {
+                "descr": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "storage.Slot": {
+            "type": "object",
+            "properties": {
+                "descr": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "storage.SosialGroup": {
+            "type": "object",
+            "properties": {
+                "descr": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}
