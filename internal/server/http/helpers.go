@@ -62,7 +62,7 @@ func getBannerRotation(w http.ResponseWriter, r *http.Request, a app.Application
 // @Description  Add Banner Rotation
 // @Tags         Banner-Rotation
 // @Produce      json
-// @Param        banner_rotation  body    storage.Rotation  true  "JSON Baneer Rotation"
+// @Param        banner_rotation  body    storage.Rotation  true  "JSON Banner Rotation"
 // @Success      200
 // @Router       /banner-rotation [post] .
 func addBannerRotation(w http.ResponseWriter, r *http.Request, a app.Application) {
@@ -97,7 +97,7 @@ func addBannerRotation(w http.ResponseWriter, r *http.Request, a app.Application
 // @Description  Delete Banner Rotation
 // @Tags         Banner-Rotation
 // @Produce      json
-// @Param        banner_rotation  body    storage.Rotation  true  "JSON Baneer Rotation"
+// @Param        banner_rotation  body    storage.Rotation  true  "JSON Banner Rotation"
 // @Success      200
 // @Router       /banner-rotation [delete] .
 func deleteBannerRotation(w http.ResponseWriter, r *http.Request, a app.Application) {
@@ -211,12 +211,12 @@ func handleAddItem(w http.ResponseWriter, r *http.Request, a app.Application, it
 // Add Banner Rotation
 // addBannerRotation             godoc
 // @Summary      Update Click Banner stat
-// @Description  Add Banner Rotation. Increase clicks count to one
-// @Tags         Banner-Rotation
+// @Description  Increase banners clicks count to one
+// @Tags         Statistic
 // @Produce      json
-// @Param        stat body Statistic  true  "JSON Banner Stat. Clicks c"
+// @Param        stat body Statistic  true  "JSON Banner Stat. Clicks count +1"
 // @Success      200
-// @Router       /banner-rotation [put] .
+// @Router       /stat [post] .
 func updateClickStat(w http.ResponseWriter, r *http.Request, a app.Application) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {

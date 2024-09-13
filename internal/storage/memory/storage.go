@@ -11,7 +11,7 @@ import (
 type Storage struct {
 	slotMap    map[int]storage.Slot
 	bannerMap  map[int]storage.Banner
-	groupMap   map[int]storage.SosialGroup
+	groupMap   map[int]storage.SocialGroup
 	rotations  []storage.Rotation
 	statistics []storage.Statistic
 	mutex      *sync.RWMutex
@@ -92,7 +92,7 @@ func (s *Storage) AddBannerToSlot(_ context.Context, bannerID int, slotID int) e
 	return nil
 }
 
-func getAllGroupIDs(gMap map[int]storage.SosialGroup) []int {
+func getAllGroupIDs(gMap map[int]storage.SocialGroup) []int {
 	result := make([]int, 0, len(gMap))
 	for id := range gMap {
 		result = append(result, id)
@@ -145,7 +145,7 @@ func (s *Storage) CreateSlot(_ context.Context, desc string) (int, error) {
 func (s *Storage) CreateGroup(_ context.Context, desc string) (int, error) {
 	s.mutex.Lock()
 	newID := getnewID(s.groupMap)
-	s.groupMap[newID] = storage.SosialGroup{
+	s.groupMap[newID] = storage.SocialGroup{
 		ID:    newID,
 		Descr: desc,
 	}
@@ -205,7 +205,7 @@ func NewMemoryStorage() *Storage {
 	return &Storage{
 		slotMap:    make(map[int]storage.Slot),
 		bannerMap:  make(map[int]storage.Banner),
-		groupMap:   make(map[int]storage.SosialGroup),
+		groupMap:   make(map[int]storage.SocialGroup),
 		rotations:  make([]storage.Rotation, 0),
 		statistics: make([]storage.Statistic, 0),
 		mutex:      &sync.RWMutex{},

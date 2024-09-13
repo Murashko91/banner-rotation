@@ -2,7 +2,7 @@ BIN := "./bin/banners_rotation"
 DB_NAME := "banners_rotation"
 DB_CONTAINER_NAME := "banners_rotation_psql"
 
-DOCKER_IMG="banners_rotation:develop"
+DOCKER_IMG="banner-app:develop"
 
 GIT_HASH := $(shell git log --format="%h" -n 1)
 LDFLAGS := -X main.release="develop" -X main.buildDate=$(shell date -u +%Y-%m-%dT%H:%M:%S) -X main.gitHash=$(GIT_HASH)
@@ -18,14 +18,18 @@ db-up:
 db-down:
 	docker stop $(DB_CONTAINER_NAME)
 	docker remove $(DB_CONTAINER_NAME)
-build-img:
+
+swag-init:
+	swag init -d ./cmd/,./internal/server/http/,./internal/storage -g main.go --parseDependency
+
+build-img: swag-init
 	docker build \
 		--build-arg=LDFLAGS="$(LDFLAGS)" \
 		-t $(DOCKER_IMG) \
 		-f build/Dockerfile .
 
 run-img: build-img
-	docker run $(DOCKER_IMG)
+	docker run  -p 8888:8888 $(DOCKER_IMG) 
 
 version: build
 	$(BIN) version
@@ -38,7 +42,20 @@ install-lint-deps:
 
 lint: install-lint-deps
 	golangci-lint run ./...
-swag-init:
-	swag init -d ./cmd/,./internal/server/http/,./internal/storage -g main.go --parseDependency
+
+up:
+	docker compose -f docker-compose.yaml up -d 
+
+up-rebuild: build-img up
+
+down:
+	docker compose -f docker-compose.yaml down 
+
+push: build-img
+	docker tag banner-app:develop murashkosv91/banner-app:develop
+	docker push murashkosv91/banner-app:develop
+
+integration-tests:
+	go test -v ./test/integration/integration_test.go
 
 .PHONY: build run build-img run-img version test lint swag-init

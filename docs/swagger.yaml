@@ -7,6 +7,8 @@ definitions:
     type: object
   internalhttp.ItemResult:
     properties:
+      descr:
+        type: string
       id:
         type: integer
     type: object
@@ -37,7 +39,7 @@ paths:
     post:
       description: Responds with the instance with added baneer ID
       parameters:
-      - description: Banner JSON(ID field could be empty for request)
+      - description: Banner JSON
         in: body
         name: banner
         required: true
@@ -59,7 +61,7 @@ paths:
     delete:
       description: Delete Banner Rotation
       parameters:
-      - description: JSON Baneer Rotation
+      - description: JSON Banner Rotation
         in: body
         name: banner_rotation
         required: true
@@ -91,13 +93,13 @@ paths:
       responses:
         "200":
           description: OK
-      summary: Get best banner for the slot and group (Bandit algoritm)
+      summary: Get best banner for the slot and group (Bandit algorithm)
       tags:
       - Banner-Rotation
     post:
       description: Add Banner Rotation
       parameters:
-      - description: JSON Baneer Rotation
+      - description: JSON Banner Rotation
         in: body
         name: banner_rotation
         required: true
@@ -109,23 +111,6 @@ paths:
         "200":
           description: OK
       summary: Add Banner to a Slot
-      tags:
-      - Banner-Rotation
-    put:
-      description: Add Banner Rotation. Increase clicks count to one
-      parameters:
-      - description: JSON Banner Stat. Clicks c
-        in: body
-        name: stat
-        required: true
-        schema:
-          $ref: '#/definitions/internalhttp.Statistic'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-      summary: Update Click Banner stat
       tags:
       - Banner-Rotation
   /group:
@@ -172,4 +157,22 @@ paths:
       summary: Create New Slot
       tags:
       - Slot
+  /stat:
+    post:
+      description: Increase banners clicks count to one
+      parameters:
+      - description: JSON Banner Stat. Clicks count +1
+        in: body
+        name: stat
+        required: true
+        schema:
+          $ref: '#/definitions/internalhttp.Statistic'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Update Click Banner stat
+      tags:
+      - Statistic
 swagger: "2.0"

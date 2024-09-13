@@ -27,7 +27,7 @@ const docTemplate = `{
                 "summary": "Create New Banner",
                 "parameters": [
                     {
-                        "description": "Banner JSON(ID field could be empty for request)",
+                        "description": "Banner JSON",
                         "name": "banner",
                         "in": "body",
                         "required": true,
@@ -58,7 +58,7 @@ const docTemplate = `{
                 "tags": [
                     "Banner-Rotation"
                 ],
-                "summary": "Get best banner for the slot and group (Bandit algoritm)",
+                "summary": "Get best banner for the slot and group (Bandit algorithm)",
                 "parameters": [
                     {
                         "type": "string",
@@ -81,32 +81,6 @@ const docTemplate = `{
                     }
                 }
             },
-            "put": {
-                "description": "Add Banner Rotation. Increase clicks count to one",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Banner-Rotation"
-                ],
-                "summary": "Update Click Banner stat",
-                "parameters": [
-                    {
-                        "description": "JSON Banner Stat. Clicks c",
-                        "name": "stat",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/internalhttp.Statistic"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            },
             "post": {
                 "description": "Add Banner Rotation",
                 "produces": [
@@ -118,7 +92,7 @@ const docTemplate = `{
                 "summary": "Add Banner to a Slot",
                 "parameters": [
                     {
-                        "description": "JSON Baneer Rotation",
+                        "description": "JSON Banner Rotation",
                         "name": "banner_rotation",
                         "in": "body",
                         "required": true,
@@ -144,7 +118,7 @@ const docTemplate = `{
                 "summary": "Delete Banner from a Slot",
                 "parameters": [
                     {
-                        "description": "JSON Baneer Rotation",
+                        "description": "JSON Banner Rotation",
                         "name": "banner_rotation",
                         "in": "body",
                         "required": true,
@@ -227,6 +201,34 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/stat": {
+            "post": {
+                "description": "Increase banners clicks count to one",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Statistic"
+                ],
+                "summary": "Update Click Banner stat",
+                "parameters": [
+                    {
+                        "description": "JSON Banner Stat. Clicks count +1",
+                        "name": "stat",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internalhttp.Statistic"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -241,6 +243,9 @@ const docTemplate = `{
         "internalhttp.ItemResult": {
             "type": "object",
             "properties": {
+                "descr": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 }

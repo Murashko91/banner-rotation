@@ -44,7 +44,7 @@ func NewServer(app app.Application, conf config.Server) *Server {
 	}
 
 	swagHandler := httpSwagger.Handler(
-		httpSwagger.URL(fmt.Sprintf("http://%s:%d/swagger/doc.json", conf.Host, conf.Port)))
+		httpSwagger.URL(fmt.Sprintf("http://localhost:%d/swagger/doc.json", conf.Port)))
 
 	bannerRouter.Handle("/banner-rotation", loggingMiddleware(http.HandlerFunc(appHandler.bannerRotationHandler)))
 	bannerRouter.Handle("/banner", loggingMiddleware(http.HandlerFunc(appHandler.bannerHandler)))
