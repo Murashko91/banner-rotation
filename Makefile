@@ -58,4 +58,4 @@ push: build-img
 integration-tests:
 	go test -v ./test/integration/integration_test.go
 
-.PHONY: build run build-img run-img version test lint swag-init
+.PHONY: build run build-img run-img version test lint swag-init integration-tests push
