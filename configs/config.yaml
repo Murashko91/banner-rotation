@@ -1,11 +1,11 @@
 
 db:
-  host: "localhost"
+  host: "postgresql"
   port: 5432
-  user: "postgres"
-  password: "postgres"
+  user: "otus"
+  password: "otus"
   dbName: "banners_rotation"
   inMemory: false
 server:
-  host: "localhost"
+  host: ""
   port: 8888

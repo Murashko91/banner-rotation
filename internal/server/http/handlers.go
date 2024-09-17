@@ -21,7 +21,6 @@ func (h Handler) bannerRotationHandler(w http.ResponseWriter, r *http.Request) {
 	default:
 		handleNotExpecterRequest(w)
 	}
-
 }
 
 func (h Handler) slotHandler(w http.ResponseWriter, r *http.Request) {
@@ -32,6 +31,7 @@ func (h Handler) slotHandler(w http.ResponseWriter, r *http.Request) {
 		handleNotExpecterRequest(w)
 	}
 }
+
 func (h Handler) bannerHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
@@ -40,6 +40,7 @@ func (h Handler) bannerHandler(w http.ResponseWriter, r *http.Request) {
 		handleNotExpecterRequest(w)
 	}
 }
+
 func (h Handler) groupHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:

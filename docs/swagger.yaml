@@ -1,0 +1,178 @@
+basePath: /
+definitions:
+  internalhttp.Item:
+    properties:
+      descr:
+        type: string
+    type: object
+  internalhttp.ItemResult:
+    properties:
+      descr:
+        type: string
+      id:
+        type: integer
+    type: object
+  internalhttp.Statistic:
+    properties:
+      bannerID:
+        type: integer
+      slotID:
+        type: integer
+      socialGroupID:
+        type: integer
+    type: object
+  storage.Rotation:
+    properties:
+      bannerID:
+        type: integer
+      slotID:
+        type: integer
+    type: object
+host: localhost:8888
+info:
+  contact: {}
+  description: API Server for Banners-Rotation API
+  title: Banners-Rotation API
+  version: "1.0"
+paths:
+  /banner:
+    post:
+      description: Responds with the instance with added baneer ID
+      parameters:
+      - description: Banner JSON
+        in: body
+        name: banner
+        required: true
+        schema:
+          $ref: '#/definitions/internalhttp.Item'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/internalhttp.ItemResult'
+            type: array
+      summary: Create New Banner
+      tags:
+      - Banner
+  /banner-rotation:
+    delete:
+      description: Delete Banner Rotation
+      parameters:
+      - description: JSON Banner Rotation
+        in: body
+        name: banner_rotation
+        required: true
+        schema:
+          $ref: '#/definitions/storage.Rotation'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Delete Banner from a Slot
+      tags:
+      - Banner-Rotation
+    get:
+      description: Get Banner Rotation
+      parameters:
+      - description: slot id
+        in: query
+        name: slot_id
+        required: true
+        type: string
+      - description: slot id
+        in: query
+        name: group_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Get best banner for the slot and group (Bandit algorithm)
+      tags:
+      - Banner-Rotation
+    post:
+      description: Add Banner Rotation
+      parameters:
+      - description: JSON Banner Rotation
+        in: body
+        name: banner_rotation
+        required: true
+        schema:
+          $ref: '#/definitions/storage.Rotation'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Add Banner to a Slot
+      tags:
+      - Banner-Rotation
+  /group:
+    post:
+      description: Responds with the instance with added baneer ID
+      parameters:
+      - description: Social Group JSON
+        in: body
+        name: sosial_group
+        required: true
+        schema:
+          $ref: '#/definitions/internalhttp.Item'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/internalhttp.ItemResult'
+            type: array
+      summary: Create New Social Group
+      tags:
+      - Social Group
+  /slot:
+    post:
+      description: Responds with the instance with added Slot ID
+      parameters:
+      - description: SlotJSON
+        in: body
+        name: slot
+        required: true
+        schema:
+          $ref: '#/definitions/internalhttp.Item'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/internalhttp.ItemResult'
+            type: array
+      summary: Create New Slot
+      tags:
+      - Slot
+  /stat:
+    post:
+      description: Increase banners clicks count to one
+      parameters:
+      - description: JSON Banner Stat. Clicks count +1
+        in: body
+        name: stat
+        required: true
+        schema:
+          $ref: '#/definitions/internalhttp.Statistic'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Update Click Banner stat
+      tags:
+      - Statistic
+swagger: "2.0"

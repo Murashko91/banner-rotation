@@ -1,0 +1,274 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API Server for Banners-Rotation API",
+        "title": "Banners-Rotation API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8888",
+    "basePath": "/",
+    "paths": {
+        "/banner": {
+            "post": {
+                "description": "Responds with the instance with added baneer ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Banner"
+                ],
+                "summary": "Create New Banner",
+                "parameters": [
+                    {
+                        "description": "Banner JSON",
+                        "name": "banner",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internalhttp.Item"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/internalhttp.ItemResult"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/banner-rotation": {
+            "get": {
+                "description": "Get Banner Rotation",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Banner-Rotation"
+                ],
+                "summary": "Get best banner for the slot and group (Bandit algorithm)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "slot id",
+                        "name": "slot_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "slot id",
+                        "name": "group_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "post": {
+                "description": "Add Banner Rotation",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Banner-Rotation"
+                ],
+                "summary": "Add Banner to a Slot",
+                "parameters": [
+                    {
+                        "description": "JSON Banner Rotation",
+                        "name": "banner_rotation",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/storage.Rotation"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete Banner Rotation",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Banner-Rotation"
+                ],
+                "summary": "Delete Banner from a Slot",
+                "parameters": [
+                    {
+                        "description": "JSON Banner Rotation",
+                        "name": "banner_rotation",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/storage.Rotation"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/group": {
+            "post": {
+                "description": "Responds with the instance with added baneer ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Social Group"
+                ],
+                "summary": "Create New Social Group",
+                "parameters": [
+                    {
+                        "description": "Social Group JSON",
+                        "name": "sosial_group",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internalhttp.Item"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/internalhttp.ItemResult"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/slot": {
+            "post": {
+                "description": "Responds with the instance with added Slot ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Slot"
+                ],
+                "summary": "Create New Slot",
+                "parameters": [
+                    {
+                        "description": "SlotJSON",
+                        "name": "slot",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internalhttp.Item"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/internalhttp.ItemResult"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/stat": {
+            "post": {
+                "description": "Increase banners clicks count to one",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Statistic"
+                ],
+                "summary": "Update Click Banner stat",
+                "parameters": [
+                    {
+                        "description": "JSON Banner Stat. Clicks count +1",
+                        "name": "stat",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internalhttp.Statistic"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "internalhttp.Item": {
+            "type": "object",
+            "properties": {
+                "descr": {
+                    "type": "string"
+                }
+            }
+        },
+        "internalhttp.ItemResult": {
+            "type": "object",
+            "properties": {
+                "descr": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "internalhttp.Statistic": {
+            "type": "object",
+            "properties": {
+                "bannerID": {
+                    "type": "integer"
+                },
+                "slotID": {
+                    "type": "integer"
+                },
+                "socialGroupID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "storage.Rotation": {
+            "type": "object",
+            "properties": {
+                "bannerID": {
+                    "type": "integer"
+                },
+                "slotID": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

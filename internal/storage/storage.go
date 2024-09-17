@@ -26,9 +26,9 @@ type Slot struct {
 	Descr string `db:"descr"`
 }
 
-type SosialGroup struct {
+type SocialGroup struct {
 	ID    int    `db:"id"`
-	Descr string `db:"desc	r"`
+	Descr string `db:"descr"`
 }
 
 type Rotation struct {
@@ -41,5 +41,5 @@ type Statistic struct {
 	SlotID        int `db:"slot"`
 	ClicksCount   int `db:"clicks"`
 	ShowsCount    int `db:"shows"`
-	SosialGroupID int `db:"s_group"`
+	SocialGroupID int `db:"s_group"`
 }

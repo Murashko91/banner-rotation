@@ -9,7 +9,7 @@ import (
 type Config struct {
 	Database DBConfig `yaml:"db"`
 	Server   Server   `yaml:"server"`
-	//Broker   Broker   `yaml:broker` //TODO KAFKA??? or RMQ???
+	// Broker   Broker   `yaml:broker` //TODO KAFKA??? or RMQ???
 }
 
 type DBConfig struct {

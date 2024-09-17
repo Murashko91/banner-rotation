@@ -1,0 +1,11 @@
+
+db:
+  host: "localhost"
+  port: 5455
+  user: "otus"
+  password: "otus"
+  dbName: "banners_rotation"
+  inMemory: false
+server:
+  host: "localhost"
+  port: 8888
